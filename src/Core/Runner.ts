@@ -37,7 +37,7 @@ export class Runner {
              }
              else {
                  Logger.getLogger().info("No record was found in CloudFlare, creating a new record for the future.");
-                 const SuccessfulCreation: boolean = await this.CloudflareAPI.createDNSRecord("A", "developer", IPAddress, 120, true);
+                 const SuccessfulCreation: boolean = await this.CloudflareAPI.createDNSRecord("A", "developer", IPAddress, 120, false);
                  Logger.getLogger().info(`Successfully created DNS: ${SuccessfulCreation}`)
              }
          }
