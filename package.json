@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Keeps developer.joshwalshaw.com updated",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsc",
+    "deploy:setup": "pm2 deploy production setup",
+    "deploy:update": "pm2 deploy production update"
   },
   "author": "Josh Walshaw <josh@joshwalshaw.com>",
   "license": "ISC",
