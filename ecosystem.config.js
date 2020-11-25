@@ -8,7 +8,8 @@ module.exports = {
   deploy : {
     production : {
       user : 'josh',
-      host : '192.168.0.40:6063',
+      host : '192.168.0.40',
+      port : '6063',
       ref  : 'origin/master',
       repo : 'git@gitlab.com:walshaw-home/cloudflare-updater.git',
       path : '/home/josh/cloudflare-updater',
