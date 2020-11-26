@@ -29,6 +29,11 @@ export class Runner {
 
         Logger.getLogger().info(`Our IP address is: ${IPAddress}`);
 
+        if ( IPAddress === TargetRecord.content ) {
+            Logger.getLogger().info("The IP in Cloudflare already matches our current one - skipping update.");
+            return;
+        }
+
         if ( IPAddress ) {
              if ( TargetRecord ) {
                  Logger.getLogger().info("We already have a record in CloudFlare, updating that record with our IP");
