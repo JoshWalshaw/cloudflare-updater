@@ -27,14 +27,14 @@ export class Runner {
         }
 
         Logger.getLogger().info("Fetching DNS records from CloudFlare.");
-         const CurrentDNSRecords: Array<IDNSRecord> = await this.CloudflareAPI.getDNSRecords();
-         const TargetRecord: IDNSRecord = CurrentDNSRecords.filter(item => item.name === process.env.DOMAIN_UPDATING && item.type === "A")[0];
+        const CurrentDNSRecords: Array<IDNSRecord> = await this.CloudflareAPI.getDNSRecords();
+        const TargetRecord: IDNSRecord = CurrentDNSRecords.filter(item => item.name === process.env.DOMAIN_UPDATING && item.type === "A")[0];
         Logger.getLogger().info("Fetching our current IP address.");
         const IPAddress = await PublicIP.v4();
 
         Logger.getLogger().info(`Our IP address is: ${IPAddress}`);
 
-        if ( IPAddress === TargetRecord.content ) {
+        if ( IPAddress === TargetRecord?.content ) {
             Logger.getLogger().info("The IP in Cloudflare already matches our current one - skipping update.");
             return;
         }
