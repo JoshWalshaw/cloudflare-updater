@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "Keeps developer.joshwalshaw.com updated",
   "scripts": {
-    "build": "tsc",
-    "deploy:setup": "pm2 deploy production setup",
-    "deploy:update": "pm2 deploy production update"
+    "build": "tsc"
   },
   "author": "Josh Walshaw <josh@joshwalshaw.com>",
   "license": "ISC",

@@ -19,12 +19,17 @@ export class Runner {
     }
 
     private async updateRecords(): Promise<void> {
-
         Logger.getLogger().info("================");
-        Logger.getLogger().info("Fetching DNS records from CloudFlare");
+
+        if (!process.env.DOMAIN_UPDATING?.length) {
+            Logger.getLogger().info("No domain listed in .env to update.");
+            return;
+        }
+
+        Logger.getLogger().info("Fetching DNS records from CloudFlare.");
          const CurrentDNSRecords: Array<IDNSRecord> = await this.CloudflareAPI.getDNSRecords();
-         const TargetRecord: IDNSRecord = CurrentDNSRecords.filter(item => item.name === "developer.joshwalshaw.com" && item.type === "A")[0];
-        Logger.getLogger().info("Fetching our current IP address");
+         const TargetRecord: IDNSRecord = CurrentDNSRecords.filter(item => item.name === process.env.DOMAIN_UPDATING && item.type === "A")[0];
+        Logger.getLogger().info("Fetching our current IP address.");
         const IPAddress = await PublicIP.v4();
 
         Logger.getLogger().info(`Our IP address is: ${IPAddress}`);
@@ -36,7 +41,7 @@ export class Runner {
 
         if ( IPAddress ) {
              if ( TargetRecord ) {
-                 Logger.getLogger().info("We already have a record in CloudFlare, updating that record with our IP");
+                 Logger.getLogger().info("We already have a record in CloudFlare, updating that record with our IP.");
                  const SuccessfulUpdate: boolean = await this.CloudflareAPI.patchDNSRecord(TargetRecord.id, IPAddress);
                  Logger.getLogger().info(`Successfully updated DNS: ${SuccessfulUpdate}`)
              }

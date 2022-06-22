@@ -1,0 +1,52 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release_package:
+    name: Release Package
+    runs-on: ubuntu-latest
+    if: startsWith( github.ref, 'refs/tags/v' ) && github.event_name != 'release'
+    permissions:
+      contents: write
+    outputs:
+      release_created: ${{ steps.create_release_step.outputs.created }}
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Set env
+        run: echo "RELEASE_VERSION=${GITHUB_REF##*/}" >> $GITHUB_ENV
+
+      - name: Get Release
+        uses: cardinalby/git-get-release-action@v1
+        id: release_check_call
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        with:
+          tag: ${{ env.RELEASE_VERSION }}
+          doNotFailIfNotFound: 'true'
+
+      - name: Create Release
+        if: ${{ steps.release_check_call.outputs.tag_name != env.RELEASE_VERSION }}
+        uses: ncipollo/release-action@v1
+        with:
+          generateReleaseNotes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Publish
+        id: create_release_step
+        if: ${{ steps.release_check_call.outputs.tag_name != env.RELEASE_VERSION }}
+        run: echo "::set-output name=created::1"
+
+  publish_package:
+    needs: release_package
+    if: ${{ needs.release_package.outputs.release_created == 1 }}
+    uses: ./.github/workflows/docker-publish.yml
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
