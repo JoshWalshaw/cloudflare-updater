@@ -21,6 +21,11 @@ export class Runner {
     private async updateRecords(): Promise<void> {
         Logger.getLogger().info("================");
 
+        if (!process.env.SUBDOMAIN_UPDATING?.length) {
+            Logger.getLogger().info("No subdomain listed in .env to update.");
+            return;
+        }
+
         if (!process.env.DOMAIN_UPDATING?.length) {
             Logger.getLogger().info("No domain listed in .env to update.");
             return;
@@ -28,7 +33,12 @@ export class Runner {
 
         Logger.getLogger().info("Fetching DNS records from CloudFlare.");
         const CurrentDNSRecords: Array<IDNSRecord> = await this.CloudflareAPI.getDNSRecords();
-        const TargetRecord: IDNSRecord = CurrentDNSRecords.filter(item => item.name === process.env.DOMAIN_UPDATING && item.type === "A")[0];
+
+        const TargetRecord: IDNSRecord = CurrentDNSRecords.filter(item =>
+            item.name === (
+                `${process.env.SUBDOMAIN_UPDATING}.${process.env.DOMAIN_UPDATING}`
+            ) && item.type === "A")[0];
+
         Logger.getLogger().info("Fetching our current IP address.");
         const IPAddress = await PublicIP.v4();
 
@@ -47,7 +57,7 @@ export class Runner {
              }
              else {
                  Logger.getLogger().info("No record was found in CloudFlare, creating a new record for the future.");
-                 const SuccessfulCreation: boolean = await this.CloudflareAPI.createDNSRecord("A", "developer", IPAddress, 120, false);
+                 const SuccessfulCreation: boolean = await this.CloudflareAPI.createDNSRecord("A", process.env.SUBDOMAIN_UPDATING, IPAddress, 120, process.env.SUBDOMAIN_IS_PROXIED === 'true');
                  Logger.getLogger().info(`Successfully created DNS: ${SuccessfulCreation}`)
              }
          }
